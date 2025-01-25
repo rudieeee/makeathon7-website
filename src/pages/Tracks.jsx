@@ -1,65 +1,50 @@
-import React, { useState } from "react";
-import styles from "../styles/Tracks.module.css";
+import React, { useState, useCallback } from 'react';
+import styles from './Tracks.module.css';
+
+
+const TRACK_BUTTONS = [
+  { id: 1, icon: 'Compass', label: 'This is Track 1' },
+  { id: 2, icon: 'Search_Magnifying_Glass', label: 'This is Track 2' },
+  { id: 3, icon: 'Close_Square', label: 'This is Track 3' },
+  { id: 4, icon: 'Swatches_Palette', label: 'This is Track 4' },
+  { id: 5, icon: 'Clock', label: 'This is Track 5' },
+];
 
 const Tracks = () => {
   const [trackText, setTrackText] = useState("TRACKS");
-  const [clickedButton, setClickedButton] = useState(null); // Track clicked button
-  const [fadeClass, setFadeClass] = useState("fade-in"); // Track fade animation class
+  const [clickedButton, setClickedButton] = useState(null);
+  const [fadeClass, setFadeClass] = useState("fadeIn");
 
-  const handleButtonClick = (trackNumber) => {
-    setFadeClass("fade-out");
+  const handleButtonClick = useCallback((trackNumber) => {
+    setFadeClass("fadeOut");
     setTimeout(() => {
       setTrackText(`TRACK ${trackNumber}`);
       setClickedButton(trackNumber);
-      setFadeClass("fade-in");
-    }, 500); // Match the duration of the fade-out animation
-  };
+      setFadeClass("fadeIn");
+    }, 500);
+  }, []);
 
-  const handleReset = () => {
-    setFadeClass("fade-out");
+  const handleReset = useCallback(() => {
+    setFadeClass("fadeOut");
     setTimeout(() => {
       setTrackText("TRACKS");
       setClickedButton(null);
-      setFadeClass("fade-in");
-    }, 500); // Match the duration of the fade-out animation
-  };
+      setFadeClass("fadeIn");
+    }, 500);
+  }, []);
 
   return (
     <div className={styles.tracksContainer}>
       <div className={styles.tracks}>
-        {clickedButton === null ? (
+        <h1
+          className={`${styles.text} ${styles[fadeClass]}`}
+          style={clickedButton !== null ? { top: '284px' } : {}}
+        >
+          {trackText}
+        </h1>
+        {clickedButton === null && (
           <>
-            <h1 className={`${styles.text} ${styles[fadeClass]}`}>
-              {trackText}
-            </h1>
             <div className={`${styles.line} ${styles[fadeClass]}`}></div>
-            <div className={`${styles.buttonContainer} ${styles[fadeClass]}`}>
-              <button
-                className={styles.button1}
-                aria-label="Track 1"
-                onClick={() => handleButtonClick(1)}
-              ></button>
-              <button
-                className={styles.button2}
-                onClick={() => handleButtonClick(2)}
-                aria-label="Track 2"
-              ></button>
-              <button
-                className={styles.button3}
-                onClick={() => handleButtonClick(3)}
-                aria-label="Track 3"
-              ></button>
-              <button
-                className={styles.button4}
-                onClick={() => handleButtonClick(4)}
-                aria-label="Track 4"
-              ></button>
-              <button
-                className={styles.button5}
-                onClick={() => handleButtonClick(5)}
-                aria-label="Track 5"
-              ></button>
-            </div>
             <div className={`${styles.box1} ${styles[fadeClass]}`}>
               <div className={styles.removebgPreview}></div>
               <div className={`${styles.text1} ${styles[fadeClass]}`}>
@@ -68,68 +53,28 @@ const Tracks = () => {
               </div>
             </div>
           </>
-        ) : (
-          <>
-            <h1
-              className={`${styles.text} ${styles[fadeClass]}`}
-              style={{
-                position: "relative",
-                top: "284px",
-              }}
-            >
-              {trackText}
-            </h1>
-            <div className={`${styles.text3} ${styles[fadeClass]}`}>
-              Additional Information for {trackText}
-            </div>
-            <div
-              className={styles.line}
-              style={{
-                position: "absolute",
-                top: "132px",
-                left: "50%",
-                transform: "translateX(-50%)",
-              }}
-            ></div>
-            <div
-              className={styles.buttonContainer}
-              style={{
-                position: "absolute",
-                top: "75px",
-                left: "50%",
-                transform: "translateX(-50%)",
-              }}
-            >
-              <button
-                className={`${styles.button1}`}
-                aria-label="Track 1"
-                onClick={() => handleButtonClick(1)}
-              ></button>
-              <button
-                className={styles.button2}
-                aria-label="Track 2"
-                onClick={() => handleButtonClick(2)}
-              ></button>
-              <button
-                className={styles.button3}
-                aria-label="Track 3"
-                onClick={() => handleButtonClick(3)}
-              ></button>
-              <button
-                className={styles.button4}
-                aria-label="Track 4"
-                onClick={() => handleButtonClick(4)}
-              ></button>
-              <button
-                className={styles.button5}
-                aria-label="Track 5"
-                onClick={() => handleButtonClick(5)}
-              ></button>
-            </div>
-          </>
         )}
         {clickedButton !== null && (
-          <button className={styles.button6} onClick={handleReset}></button>
+          <div className={`${styles.text3} ${styles[fadeClass]}`}>
+            Additional Information for {trackText}
+          </div>
+        )}
+        <div
+          className={`${styles.buttonContainer} ${styles[fadeClass]}`}
+          style={clickedButton !== null ? { top: '75px' } : {}}
+        >
+          {TRACK_BUTTONS.map((button) => (
+            <button
+              key={button.id}
+              className={styles[`button${button.id}`]} // Fixed class name interpolation
+              aria-label={`Track ${button.id}`} // Corrected aria-label
+              onClick={() => handleButtonClick(button.id)}
+              data-tooltip={button.label}
+            />
+          ))}
+        </div>
+        {clickedButton !== null && (
+          <button className={styles.button6} onClick={handleReset} aria-label="Reset"></button>
         )}
       </div>
     </div>
